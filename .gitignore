@@ -1,0 +1,10 @@
+# Created by .ignore support plugin (hsz.mobi)
+/.idea/
+/mybatis-generator.iml
+/.classpath
+/target/
+/.project
+/.settings/
+/src/site/
+/src/site/site.xml
+/mybatis-generator-core.iml
