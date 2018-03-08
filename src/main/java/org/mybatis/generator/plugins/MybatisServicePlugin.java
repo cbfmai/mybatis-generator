@@ -141,7 +141,7 @@ public class MybatisServicePlugin extends PluginAdapter {
         this.listType = new FullyQualifiedJavaType("java.util.List");
         this.mapType = new FullyQualifiedJavaType("java.util.Map");
         this.stringUtilsType = new FullyQualifiedJavaType("org.springframework.util.StringUtils");
-        this.pagerType = new FullyQualifiedJavaType("com.umoney.finance.common.entity.Pager");
+        this.pagerType = new FullyQualifiedJavaType("com.msys.skynet.common.entity.Pager");
         Interface interface1 = new Interface(this.interfaceType);
         TopLevelClass topLevelClass = new TopLevelClass(this.serviceType);
         addLogger(topLevelClass);
@@ -233,7 +233,7 @@ public class MybatisServicePlugin extends PluginAdapter {
         Method method = new Method();
         method.setName("getPager" + tableName);
         method.setReturnType(new FullyQualifiedJavaType("Pager<" + tableName + ">"));
-        method.addParameter(new Parameter(new FullyQualifiedJavaType("Map<String,Object>"), "params"));
+        method.addParameter(new Parameter(new FullyQualifiedJavaType("Map<String, Object>"), "params"));
         method.setVisibility(JavaVisibility.PUBLIC);
         method.addBodyLine(this.pojoCriteriaType.getShortName() + " criteria = new "
                 + this.pojoCriteriaType.getShortName() + "();");
@@ -247,8 +247,8 @@ public class MybatisServicePlugin extends PluginAdapter {
         method.addBodyLine("pager.setSize(Integer.parseInt(params.get(\"size\").toString()));");
         method.addBodyLine("}");
         method.addBodyLine("int start = (pager.getCurrentPage()-1)*pager.getSize();");
-        method.addBodyLine("criteria.setStart(start);");
-        method.addBodyLine("criteria.setSize(pager.getSize());");
+        method.addBodyLine("criteria.setLimit(start);");
+        method.addBodyLine("criteria.setOffset(pager.getSize());");
 
         method.addBodyLine("setCriteria(cri, params);");
         method.addBodyLine("pager.setData(" + getDaoShort() + "selectByCondition(criteria));");
@@ -381,9 +381,9 @@ public class MybatisServicePlugin extends PluginAdapter {
         for (IntrospectedColumn introspectedColumn : introspectedColumnsList) {
             if ("id".equalsIgnoreCase(introspectedColumn.getJavaProperty())) {
                 topLevelClass.addImportedType(
-                        new FullyQualifiedJavaType("com.umoney.finance.common.utils.RandomGeneratorUtils"));
+                        new FullyQualifiedJavaType("com.msys.skynet.common.util.ObjectId"));
                 method.addBodyLine("if(StringUtils.isEmpty(record.getId())){");
-                method.addBodyLine("record.setId(RandomGeneratorUtils.generateUUID());");
+                method.addBodyLine("record.setId(ObjectId.get().toString());");
                 method.addBodyLine("}");
             }
             if ("createdTime".equalsIgnoreCase(introspectedColumn.getJavaProperty())) {
@@ -473,7 +473,6 @@ public class MybatisServicePlugin extends PluginAdapter {
         topLevelClass.setVisibility(JavaVisibility.PUBLIC);
 
         topLevelClass.addSuperInterface(this.interfaceType);
-        topLevelClass.addImportedType(new FullyQualifiedJavaType("com.umoney.finance.common.entity.EntityStatus"));
         if (this.enableAnnotation) {
             topLevelClass.addAnnotation("@Service");
             topLevelClass.addImportedType(this.service);
@@ -800,7 +799,7 @@ public class MybatisServicePlugin extends PluginAdapter {
             topLevelClass.addImportedType(this.service);
             topLevelClass.addImportedType(this.autowired);
         }
-        topLevelClass.addImportedType(new FullyQualifiedJavaType("com.umoney.finance.common.entity.HttpStatus"));
+        topLevelClass.addImportedType(new FullyQualifiedJavaType("com.msys.skynet.common.entity.HttpStatus"));
     }
 
     private void addLogger(TopLevelClass topLevelClass) {

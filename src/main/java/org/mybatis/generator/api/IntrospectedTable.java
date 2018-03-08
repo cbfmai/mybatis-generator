@@ -786,7 +786,7 @@ public abstract class IntrospectedTable {
         setSqlMapFullyQualifiedRuntimeTableName(calculateSqlMapFullyQualifiedRuntimeTableName());
         setSqlMapAliasedFullyQualifiedRuntimeTableName(calculateSqlMapAliasedFullyQualifiedRuntimeTableName());
 
-        setCountByExampleStatementId("countByExample"); //$NON-NLS-1$
+        /*setCountByExampleStatementId("countByExample"); //$NON-NLS-1$
         setDeleteByExampleStatementId("deleteByExample"); //$NON-NLS-1$
         setDeleteByPrimaryKeyStatementId("deleteByPrimaryKey"); //$NON-NLS-1$
         setInsertStatementId("insert"); //$NON-NLS-1$
@@ -806,7 +806,30 @@ public abstract class IntrospectedTable {
         setExampleWhereClauseId("Example_Where_Clause"); //$NON-NLS-1$
         setBaseColumnListId("Base_Column_List"); //$NON-NLS-1$
         setBlobColumnListId("Blob_Column_List"); //$NON-NLS-1$
-        setMyBatis3UpdateByExampleWhereClauseId("Update_By_Example_Where_Clause"); //$NON-NLS-1$
+        setMyBatis3UpdateByExampleWhereClauseId("Update_By_Example_Where_Clause"); //$NON-NLS-1$*/
+
+        // Update date by ADAM DENG on 2018-03-08
+        setCountByExampleStatementId("countByCondition");
+        setDeleteByExampleStatementId("deleteByCondition");
+        setDeleteByPrimaryKeyStatementId("deleteByPrimaryKey");
+        setInsertStatementId("insert");
+        setInsertSelectiveStatementId("insertSelective");
+        setSelectAllStatementId("selectAll");
+        setSelectByExampleStatementId("selectByCondition");
+        setSelectByExampleWithBLOBsStatementId("selectByConditionWithBLOBs");
+        setSelectByPrimaryKeyStatementId("selectByPrimaryKey");
+        setUpdateByExampleStatementId("updateByCondition");
+        setUpdateByExampleSelectiveStatementId("updateByConditionSelective");
+        setUpdateByExampleWithBLOBsStatementId("updateByConditionWithBLOBs");
+        setUpdateByPrimaryKeyStatementId("updateByPrimaryKey");
+        setUpdateByPrimaryKeySelectiveStatementId("updateByPrimaryKeySelective");
+        setUpdateByPrimaryKeyWithBLOBsStatementId("updateByPrimaryKeyWithBLOBs");
+        setBaseResultMapId("BaseResultMap");
+        setResultMapWithBLOBsId("ResultMapWithBLOBs");
+        setExampleWhereClauseId("Condition_Where_Clause");
+        setBaseColumnListId("Base_Column_List");
+        setBlobColumnListId("Blob_Column_List");
+        setMyBatis3UpdateByExampleWhereClauseId("Update_By_Condition_Where_Clause");
     }
 
     /**
