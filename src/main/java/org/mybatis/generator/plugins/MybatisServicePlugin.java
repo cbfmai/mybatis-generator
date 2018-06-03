@@ -1,17 +1,17 @@
 /**
- *    Copyright ${license.git.copyrightYears} the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Copyright ${license.git.copyrightYears} the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.mybatis.generator.plugins;
 
@@ -141,7 +141,7 @@ public class MybatisServicePlugin extends PluginAdapter {
         this.listType = new FullyQualifiedJavaType("java.util.List");
         this.mapType = new FullyQualifiedJavaType("java.util.Map");
         this.stringUtilsType = new FullyQualifiedJavaType("org.springframework.util.StringUtils");
-        this.pagerType = new FullyQualifiedJavaType("com.msys.skynet.common.entity.Pager");
+        this.pagerType = new FullyQualifiedJavaType("com.mmtech.common.entity.Pager");
         Interface interface1 = new Interface(this.interfaceType);
         TopLevelClass topLevelClass = new TopLevelClass(this.serviceType);
         addLogger(topLevelClass);
@@ -156,7 +156,7 @@ public class MybatisServicePlugin extends PluginAdapter {
     }
 
     protected void addService(TopLevelClass topLevelClass, Interface interface1, IntrospectedTable introspectedTable,
-            String tableName, List<GeneratedJavaFile> files) {
+                              String tableName, List<GeneratedJavaFile> files) {
         interface1.setVisibility(JavaVisibility.PUBLIC);
 
         Method method = addEntity(topLevelClass, introspectedTable, tableName);
@@ -240,7 +240,7 @@ public class MybatisServicePlugin extends PluginAdapter {
         method.addBodyLine("Pager<" + tableName + "> pager = new Pager<" + tableName + ">();");
         method.addBodyLine(this.pojoSubCriteriaType.getShortName() + " cri = criteria.createCriteria();");
 
-        method.addBodyLine("if( params.containsKey(\"page\") ){");
+        /*method.addBodyLine("if( params.containsKey(\"page\") ){");
         method.addBodyLine("pager.setCurrentPage(Integer.parseInt(params.get(\"page\").toString()));");
         method.addBodyLine("}");
         method.addBodyLine("if(params.containsKey(\"size\") ){");
@@ -248,8 +248,16 @@ public class MybatisServicePlugin extends PluginAdapter {
         method.addBodyLine("}");
         method.addBodyLine("int start = (pager.getCurrentPage()-1)*pager.getSize();");
         method.addBodyLine("criteria.setLimit(start);");
-        method.addBodyLine("criteria.setOffset(pager.getSize());");
+        method.addBodyLine("criteria.setOffset(pager.getSize());");*/
 
+        method.addBodyLine("if (params.containsKey(\"offset\")) {\n" +
+                "    int offset = Integer.parseInt(params.get(\"offset\").toString());\n" +
+                "    int limit = Integer.parseInt(params.get(\"limit\").toString());\n" +
+                "    pager.setCurrentPage(offset / limit + 1);\n" +
+                "}\n" +
+                "if (params.containsKey(\"limit\")) {\n" +
+                "    pager.setSize(Integer.parseInt(params.get(\"limit\").toString()));\n" +
+                "}");
         method.addBodyLine("setCriteria(cri, params);");
         method.addBodyLine("pager.setData(" + getDaoShort() + "selectByCondition(criteria));");
         method.addBodyLine("pager.setTotal(" + getDaoShort() + "countByCondition(criteria));");
@@ -281,7 +289,7 @@ public class MybatisServicePlugin extends PluginAdapter {
                 method.addBodyLine("}");
             }
         }
-        method.addBodyLine(String.format("return this.%sselectByCondition(criteria);", new Object[] { getDaoShort() }));
+        method.addBodyLine(String.format("return this.%sselectByCondition(criteria);", new Object[]{getDaoShort()}));
 
         return method;
     }
@@ -333,20 +341,14 @@ public class MybatisServicePlugin extends PluginAdapter {
             }
             if ("updatedTime".equalsIgnoreCase(introspectedColumn.getJavaProperty())) {
                 topLevelClass.addImportedType(new FullyQualifiedJavaType("java.util.Date"));
-                method.addBodyLine("record.setUpdatedTime(new Date(System.currentTimeMillis()));");
-            }
-            if ("createdTime".equalsIgnoreCase(introspectedColumn.getJavaProperty())) {
-                topLevelClass.addImportedType(new FullyQualifiedJavaType("java.util.Date"));
-                method.addBodyLine("record.setCreatedTime(null);");
+                method.addBodyLine("record.setUpdatedTime(new Date());");
             }
         }
-        method.addBodyLine(
-                String.format("if(this.%supdateByPrimaryKeySelective(record)==1){", new Object[] { getDaoShort() }));
-        method.addBodyLine("record.setHttpState(HttpStatus.SUCCESS);");
-        method.addBodyLine("}else{");
-        method.addBodyLine("record.setHttpState(HttpStatus.FAIL);");
-        method.addBodyLine("}");
-        method.addBodyLine("return record;");
+        method.addBodyLine(String.format("if (this.%supdateByPrimaryKeySelective(record) == 1 ) {", new Object[]{getDaoShort()}));
+        method.addBodyLine(" return record;");
+        method.addBodyLine(" } else { ");
+        method.addBodyLine(" return null;");
+        method.addBodyLine(" }");
         return method;
     }
 
@@ -381,9 +383,9 @@ public class MybatisServicePlugin extends PluginAdapter {
         for (IntrospectedColumn introspectedColumn : introspectedColumnsList) {
             if ("id".equalsIgnoreCase(introspectedColumn.getJavaProperty())) {
                 topLevelClass.addImportedType(
-                        new FullyQualifiedJavaType("com.msys.skynet.common.util.ObjectId"));
+                        new FullyQualifiedJavaType("com.mmtech.common.util.SnowFlake"));
                 method.addBodyLine("if(StringUtils.isEmpty(record.getId())){");
-                method.addBodyLine("record.setId(ObjectId.get().toString());");
+                method.addBodyLine("record.setId(SnowFlake.getId());");
                 method.addBodyLine("}");
             }
             if ("createdTime".equalsIgnoreCase(introspectedColumn.getJavaProperty())) {
@@ -395,12 +397,11 @@ public class MybatisServicePlugin extends PluginAdapter {
                 method.addBodyLine("record.setUpdatedTime(new Date( System.currentTimeMillis()));");
             }
         }
-        method.addBodyLine(String.format("if(this.%sinsert(record)==1){", new Object[] { getDaoShort() }));
-        method.addBodyLine("record.setHttpState(HttpStatus.SUCCESS);");
-        method.addBodyLine("}else{");
-        method.addBodyLine("record.setHttpState(HttpStatus.FAIL);");
-        method.addBodyLine("}");
+        method.addBodyLine(String.format("if ( this.%sinsert(record) == 1 ) {", new Object[]{getDaoShort()}));
         method.addBodyLine("return record;");
+        method.addBodyLine("} else { ");
+        method.addBodyLine(" return null;");
+        method.addBodyLine("}");
         return method;
     }
 
@@ -469,7 +470,7 @@ public class MybatisServicePlugin extends PluginAdapter {
     }
 
     protected void addServiceImpl(TopLevelClass topLevelClass, IntrospectedTable introspectedTable, String tableName,
-            List<GeneratedJavaFile> files) {
+                                  List<GeneratedJavaFile> files) {
         topLevelClass.setVisibility(JavaVisibility.PUBLIC);
 
         topLevelClass.addSuperInterface(this.interfaceType);
@@ -605,7 +606,7 @@ public class MybatisServicePlugin extends PluginAdapter {
     }
 
     protected Method getOtherInteger(String methodName, String daoName, IntrospectedTable introspectedTable,
-            String tableName, int type) {
+                                     String tableName, int type) {
         Method method = new Method();
         method.setName(methodName);
         method.setReturnType(FullyQualifiedJavaType.getIntInstance());
@@ -629,7 +630,7 @@ public class MybatisServicePlugin extends PluginAdapter {
     }
 
     protected Method getOtherInsertboolean(String methodName, String daoName, IntrospectedTable introspectedTable,
-            String tableName) {
+                                           String tableName) {
         Method method = new Method();
         method.setName(methodName);
         method.setReturnType(this.returnType);
@@ -652,35 +653,35 @@ public class MybatisServicePlugin extends PluginAdapter {
 
     protected String addParams(IntrospectedTable introspectedTable, Method method, int type1) {
         switch (type1) {
-        case 1:
-            method.addParameter(new Parameter(this.pojoType, "record"));
-            return "record";
-        case 2:
-            FullyQualifiedJavaType type;
-            if (introspectedTable.getRules().generatePrimaryKeyClass()) {
-                type = new FullyQualifiedJavaType(introspectedTable.getPrimaryKeyType());
-                method.addParameter(new Parameter(type, "key"));
-            } else {
-                for (IntrospectedColumn introspectedColumn : introspectedTable.getPrimaryKeyColumns()) {
-                    type = introspectedColumn.getFullyQualifiedJavaType();
-                    method.addParameter(new Parameter(type, introspectedColumn.getJavaProperty()));
+            case 1:
+                method.addParameter(new Parameter(this.pojoType, "record"));
+                return "record";
+            case 2:
+                FullyQualifiedJavaType type;
+                if (introspectedTable.getRules().generatePrimaryKeyClass()) {
+                    type = new FullyQualifiedJavaType(introspectedTable.getPrimaryKeyType());
+                    method.addParameter(new Parameter(type, "key"));
+                } else {
+                    for (IntrospectedColumn introspectedColumn : introspectedTable.getPrimaryKeyColumns()) {
+                        type = introspectedColumn.getFullyQualifiedJavaType();
+                        method.addParameter(new Parameter(type, introspectedColumn.getJavaProperty()));
+                    }
                 }
-            }
-            StringBuffer sb = new StringBuffer();
-            for (IntrospectedColumn introspectedColumn : introspectedTable.getPrimaryKeyColumns()) {
-                sb.append(introspectedColumn.getJavaProperty());
-                sb.append(",");
-            }
-            sb.setLength(sb.length() - 1);
-            return sb.toString();
-        case 3:
-            method.addParameter(new Parameter(this.pojoCriteriaType, "condition"));
-            return "condition";
-        case 4:
-            method.addParameter(0, new Parameter(this.pojoType, "record"));
-            method.addParameter(1, new Parameter(this.pojoCriteriaType, "condition"));
+                StringBuffer sb = new StringBuffer();
+                for (IntrospectedColumn introspectedColumn : introspectedTable.getPrimaryKeyColumns()) {
+                    sb.append(introspectedColumn.getJavaProperty());
+                    sb.append(",");
+                }
+                sb.setLength(sb.length() - 1);
+                return sb.toString();
+            case 3:
+                method.addParameter(new Parameter(this.pojoCriteriaType, "condition"));
+                return "condition";
+            case 4:
+                method.addParameter(0, new Parameter(this.pojoType, "record"));
+                method.addParameter(1, new Parameter(this.pojoCriteriaType, "condition"));
 
-            return "record, condition";
+                return "record, condition";
         }
         return null;
     }
@@ -799,7 +800,6 @@ public class MybatisServicePlugin extends PluginAdapter {
             topLevelClass.addImportedType(this.service);
             topLevelClass.addImportedType(this.autowired);
         }
-        topLevelClass.addImportedType(new FullyQualifiedJavaType("com.msys.skynet.common.entity.HttpStatus"));
     }
 
     private void addLogger(TopLevelClass topLevelClass) {
@@ -818,7 +818,7 @@ public class MybatisServicePlugin extends PluginAdapter {
     }
 
     public boolean clientInsertMethodGenerated(Method method, Interface interfaze,
-            IntrospectedTable introspectedTable) {
+                                               IntrospectedTable introspectedTable) {
         this.returnType = method.getReturnType();
         return true;
     }
