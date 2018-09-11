@@ -96,6 +96,7 @@
   </build>
   
   <dependencies>
+    <!-- https://mvnrepository.com/artifact/com.alibaba/fastjson -->
     <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>

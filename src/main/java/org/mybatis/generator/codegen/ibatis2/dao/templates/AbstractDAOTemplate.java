@@ -492,7 +492,7 @@ public abstract class AbstractDAOTemplate {
 
     /**
      * Override this method to add fields to any generated DAO implementation
-     * class. When overriding this method, call <code>addField(Field)</code> one
+     * class. When overriding this method, call <code>addServiceField(Field)</code> one
      * or more times to add field(s) to the generated DAO implementation class.
      */
     protected void configureFields() {
