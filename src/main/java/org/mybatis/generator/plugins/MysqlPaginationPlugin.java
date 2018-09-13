@@ -93,7 +93,7 @@ public class MysqlPaginationPlugin extends PluginAdapter {
             IntrospectedTable introspectedTable) {
 
         XmlElement ifLimitNotNullElement = new XmlElement("if");
-        ifLimitNotNullElement.addAttribute(new Attribute("test", "limit != null and limit >= 0"));
+        ifLimitNotNullElement.addAttribute(new Attribute("test", "limit != null and limit > 0"));
 
         XmlElement ifOffsetNotNullElement = new XmlElement("if");
         ifOffsetNotNullElement.addAttribute(new Attribute("test", "offset != null and offset > 0"));

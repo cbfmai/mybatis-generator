@@ -74,8 +74,8 @@ public class MybatisControllerPlugin extends PluginAdapter {
         String tableName = table.replaceAll(this.pojoUrl + ".", "");
         this.controllerType = new FullyQualifiedJavaType(this.controllerPack + "." + tableName + "Controller");
         this.serviceType = new FullyQualifiedJavaType(this.servicePack + "." + tableName + "Service");
-        this.genericController = new FullyQualifiedJavaType("com.zteict.common.controller.GenericController");
-        this.genericService = new FullyQualifiedJavaType("com.zteict.common.service.GenericService");
+        this.genericController = new FullyQualifiedJavaType("GenericController");
+        this.genericService = new FullyQualifiedJavaType("GenericService");
 
         TopLevelClass topLevelClass = new TopLevelClass(this.controllerType);
         addLogger(topLevelClass);
@@ -107,6 +107,10 @@ public class MybatisControllerPlugin extends PluginAdapter {
         topLevelClass.addImportedType(parameterType);
         topLevelClass.addImportedType(exampleJavaType);
 
+        genericService.addTypeArgument(parameterType);
+        genericService.addTypeArgument(exampleJavaType);
+        genericService.addTypeArgument(generateKeyJavaType);
+
         topLevelClass.setSuperClass(this.genericController);
 
         if (this.enableAnnotation) {
@@ -117,7 +121,7 @@ public class MybatisControllerPlugin extends PluginAdapter {
         addServiceField(topLevelClass, tableName);
 
         topLevelClass.addMethod(getService(topLevelClass, introspectedTable, tableName));
-        topLevelClass.addMethod(generatePrimaryKey(topLevelClass, introspectedTable, tableName));
+        //topLevelClass.addMethod(generatePrimaryKey(topLevelClass, introspectedTable, tableName));
 
         GeneratedJavaFile file = new GeneratedJavaFile(topLevelClass, this.project,
                 this.context.getProperty("javaFileEncoding"), this.context.getJavaFormatter());
@@ -195,9 +199,9 @@ public class MybatisControllerPlugin extends PluginAdapter {
     }
 
     private void addImport(TopLevelClass topLevelClass) {
-        topLevelClass.addImportedType(this.genericController);
+        topLevelClass.addImportedType(new FullyQualifiedJavaType("com.zteict.common.controller.GenericController"));
         topLevelClass.addImportedType(this.serviceType);
-        topLevelClass.addImportedType(this.genericService);
+        topLevelClass.addImportedType(new FullyQualifiedJavaType("com.zteict.common.service.GenericService"));
         topLevelClass.addImportedType(this.requestMapping);
         topLevelClass.addImportedType(this.restController);
         topLevelClass.addImportedType(this.autowired);
